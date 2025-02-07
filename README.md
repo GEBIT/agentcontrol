@@ -1,4 +1,7 @@
 # Agent Control
+
+[Download latest stable release](https://github.com/GEBIT/agentcontrol/releases/download/0.0.1/agentControl-0.0.1.jar)
+
 ![logo](./logo.jpg)
 
 With this agent you can debug and automate any Java Desktop UI from a groovy web console.  
