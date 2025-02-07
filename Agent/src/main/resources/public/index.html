@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentControl</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e5dfdf;
+            color: #24292e;
+            display: grid;
+            grid-template-rows: 15% 25% 60%;
+            height: 100vh;
+        }
+
+        .row{
+            padding: 1rem;
+        }
+
+        header {
+            background-color: #2cbe4e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        h1, h2 {
+            color: #24292e;
+        }
+
+        #logo{
+            width: 130px;
+            float: left;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #c8e1cc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            color: #24292e;
+            resize: vertical;
+        }
+
+        button {
+            background-color: #c13e37;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #output {
+            width: 100%;
+            heigth: 100%;
+            border: 1px solid #c8e1cc;
+            border-radius: 4px;
+            background-color: white;
+            padding: 10px;
+            box-sizing: border-box; /* Include padding and border in the width */
+            overflow: auto;
+            height: 100%;
+            white-space: pre-wrap;
+        }
+    </style>
+
+
+</head>
+<body>
+
+<div id="top" class="row">
+    <img id="logo" src="logo.jpg"/>
+    <h1>AgentControl</h1>
+
+    <h2>Use global instance ac (Agent Commands) to control the agent</h2>
+</div>
+<div id="middle" class="row">
+    <p><textarea id="groovyCode" rows="4" cols="50" onkeydown="checkCtrlEnter(event)">
+// ac.toString() will print all available commands
+ac
+    </textarea></p>
+    <p>
+        <button onclick="clearOutput()">Clear</button>
+        <button onclick="executeGroovyCode()">Execute</button>
+    </p>
+</div>
+
+<div id="bottom" class="row">
+    <div id="output"></div>
+</div>
+
+<script>
+
+
+const outputDiv = document.getElementById('output');
+
+const escapeHtml = (unsafe) => {
+    return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+}
+
+function executeGroovyCode() {
+    const groovyCode = document.getElementById('groovyCode').value;
+    const url = '/execute';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+        body: groovyCode,
+    })
+    .then(response => response.text())
+    .then(result => {
+        outputDiv.appendChild(document.createElement("br"));
+        outputDiv.appendChild(document.createTextNode("Result: "));
+        outputDiv.appendChild(document.createElement("br"));
+
+        const text = document.createTextNode(result);
+        outputDiv.appendChild(text);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Append the error as a new paragraph in the output div
+        const outputDiv = document.getElementById('output');
+        outputDiv.innerHTML += '<p>Error: ' + error + '</p>';
+    });
+}
+
+function checkCtrlEnter(event) {
+    if (event.ctrlKey && event.key === 'Enter') {
+        event.preventDefault(); // Prevent the default newline behavior
+        executeGroovyCode();
+    }
+}
+
+function clearOutput(event) {
+    outputDiv.innerHTML = '';
+}
+    </script>
+</body>
+</html>
