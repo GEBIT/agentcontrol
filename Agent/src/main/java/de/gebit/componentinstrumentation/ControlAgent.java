@@ -2,6 +2,7 @@ package de.gebit.componentinstrumentation;
 
 import static net.bytebuddy.matcher.ElementMatchers.isConstructor;
 import static net.bytebuddy.matcher.ElementMatchers.isMethod;
+import static net.bytebuddy.matcher.ElementMatchers.isSubTypeOf;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 import static net.bytebuddy.matcher.ElementMatchers.none;
 import static spark.Spark.get;
@@ -494,7 +495,9 @@ public class ControlAgent {
         try {
             AgentBuilder.Ignored withAllCals = new AgentBuilder.Default().ignore(none());
             withAllCals
-                    .type(nameContains("java.awt.Component"))
+                    .ignore(none())
+                    .with(AgentBuilder.Listener.StreamWriting.toSystemOut())
+                    .type(isSubTypeOf(Component.class))
                     .transform((
                             aBuilder,
                             aTypeDescription,
